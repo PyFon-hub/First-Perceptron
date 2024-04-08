@@ -1,43 +1,49 @@
 import numpy as np
 from numpy import random
 
-def sigmoid(x):
-    return 1/ (1 + np.e**(-x))
+class Perceptron():
+    def __init__(self) -> None:
+        
+        random.seed(1)
+        self.synaptic_weight = random.random((3,1))
 
-def sigmoid_deverative(x):
-    return x*(1-x)
+    def __sigmoid(self, x):
+        return 1/ (1 + np.e**(-x))
 
-train_input = np.array([[0,0,1],
-                       [1,1,1],
-                       [1,0,1],
-                       [0,1,1]])
+    def __sigmoid_deverative(self, x):
+        return x*(1-x)
+    
+    def train(self, training_input, training_output, epoch):
 
-train_output = np.array([[0,1,1,0]]).T
+        for _ in range(epoch):
+            
+            output = self.think(training_input)
+            error = training_output - output
 
-random.seed(1)
-synaptic_weight = random.random((3,1))
+            adjustments = error * self.__sigmoid_deverative(output)
 
+            self.synaptic_weight  += np.dot(training_input.T, adjustments)
 
-#print(f"synaptic_weight: \n", synaptic_weight)
-
-for iteration in  range(10000):
-
-    input_layer = train_input
-
-    output = sigmoid(np.dot(train_input, synaptic_weight))
-
-    error = train_output - output
-
-    adjustments = error * sigmoid_deverative(output)
-
-    synaptic_weight  += np.dot(input_layer.T, adjustments)
-
-print(f"Waga po treningu: \n", synaptic_weight)
-print(f"Wynik po treningu: \n", output)
-
-print(f"Wynik inputu: ", sigmoid(np.dot(np.array([[1,0,0]]), synaptic_weight)))
+    def think(self, inputs):
+        inputs = inputs.astype(float)
+        output = self.__sigmoid(np.dot(inputs, self.synaptic_weight))
+        return output
 
 
+
+if __name__ == "__main__":
+
+    train_input = np.array([[0,0,1],
+                           [1,1,1],
+                           [1,0,1],
+                           [0,1,1]])
+
+    train_output = np.array([[0,1,1,0]]).T
+
+    perceptron = Perceptron()
+    perceptron.train(train_input, train_output, 10000)
+    print(f"Answer; ", perceptron.think(np.array([[1,0,0]])) )
+    
 
 
 
